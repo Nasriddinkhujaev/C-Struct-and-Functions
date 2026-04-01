@@ -175,3 +175,30 @@ void delete (HashTable *ht, char *key){
 }
 // one line example usage of delete function
 // delete(hashTable, "name"); // deletes the key-value pair with the key "name" from the hash table pointed to by hashTable. if the key is not found in the hash table, it will print an error message indicating that the key was not found. if the key is found, it will free the memory allocated for the key-value pair and set the corresponding index in the hash table to NULL.
+
+
+// 10. define a function to search for a value based on the key in the hash table
+
+char *search(HashTable *ht, char *key)
+{
+    if (ht == NULL || key == NULL) // check if the hash table or key is null. if either is null, we cannot perform a search, so we return NULL to indicate that the search was unsuccessful.
+    {
+        return NULL;
+    }
+
+    int index = hashFunction(key) % ht->size; // compute the index for the given key using the hash function. this will determine where in the hash table we should look for the key-value pair.
+
+    // check if slot is empty
+    if (ht->table[index] == NULL) // check if the slot at the computed index is empty (i.e., it does not contain a key-value pair). if it is empty, it means that the key we are searching for is not present in the hash table, so we return NULL to indicate that the search was unsuccessful.
+    {
+        return NULL;
+    }
+
+    // check if key matches
+    if (strcmp(ht->table[index]->key, key) == 0) // check if the key at the computed index matches the given key using strcmp. if it matches, it means we have found the key-value pair we are looking for, so we return the value associated with that key.
+    {
+        return ht->table[index]->value; // return the value
+    }
+
+    return NULL; // key not found
+}
