@@ -146,5 +146,32 @@ void insert (HashTable *ht, char *key, char *value){
     printf("Collision occurred at index %d\n", index); // print an error message that a collisionn occured at the computed index. this means that there is already a different key-value pair stored at that index, and we cannot insert the new key-value pair without overwriting the existing one.
     return; // return after handling the collision 
 }
+// one line example usage of insert function
+// insert(hashTable, "name", "John"); // inserts the key-value pair {"name, "John"} into the hash table pointed to by hashTable. if the key "name" already exists in the hash table, it will update the value to "John". if there is a collision at the computed index, it will print an error message indicating that a collision occurred.
 
 
+// 9. Define a function to delete a {key, value} pair from the Hash Table.
+
+void delete (HashTable *ht, char *key){
+    int index = hashFunction(key) % ht->size; // compute the index for the given key using the hash function
+
+    // check if empty
+    if (ht->table[index] == NULL) 
+    {
+        printf("Key not found: %s\n", key);
+        return;
+    }
+
+    // check if key matches
+    if (strcmp(ht->table[index]->key, key) != 0) 
+    {
+        printf("Key not found: %s\n", key);
+        return;
+    }
+
+    // delete
+    freeKeyValuePair(ht->table[index]); // free the memory allocation 
+    ht->table[index] = NULL; // set the index in the hash table to NULL 
+}
+// one line example usage of delete function
+// delete(hashTable, "name"); // deletes the key-value pair with the key "name" from the hash table pointed to by hashTable. if the key is not found in the hash table, it will print an error message indicating that the key was not found. if the key is found, it will free the memory allocated for the key-value pair and set the corresponding index in the hash table to NULL.
