@@ -113,3 +113,38 @@ int hashFunction(char *key)
 // one line example usage of hashFunction
 // int index = hashFunction("name"); // computes the hash value for the key "name" and stores it in the variable index. this hash value can then be used to determine where to store the key-value pair in the hash table.
 
+// 8. Define an Insert function to insert a {key, value} pair into the Hash Table(15 points)
+//      1. Create a {key, value} pair
+//      2. Compute the index based on the hash function
+//      3. Check if the index is already occupied or not by comparing the key
+//      4. If it is not occupied, we can directly insert it into the index
+//      5. Otherwise, it is a collision, and we need to:
+//      5.1 update the item value only to the new one if {key, value} pair already exists (i.e., the
+//      same item pair was already inserted before)
+//      5.2 return an error message due to overflow
+// [Hint: the function header for insert is: void insert (HashTable* hashtable, char* key, char* value);]
+
+void insert (HashTable *ht, char *key, char *value){
+    if(ht == NULL){
+        return; // if the hash table is null, just return
+    }
+    int index = hashFunction(key) % ht->size; // compute the index for the given key
+
+    // case 1: if the index is not occupied
+    if(ht->table[index] == NULL){
+        ht->table[index] = createKeyValuePair(key, value); // if the index is not occupied, create a new key-value pair and insert it into the hash table at the computed index.
+        return; // return after inserting the new key-value pair
+    }
+    // case 2: if the index is occupied
+    if(strcmp(ht->table[index]->key, key) == 0){ // check if the key at the occupied index matches the given key using strcmp
+        free(ht->table[index]->value); // free the memory allocated for the old value to prevent memory leaks
+        ht->table[index]->value = strdup(value); // update the value for the existing key by duplicating the new value string and assigning it to the value member of the KeyValuePair structure at that index
+        return; // return after updating the value
+    }
+
+    // case 3: if there is a collision
+    printf("Collision occurred at index %d\n", index); // print an error message that a collisionn occured at the computed index. this means that there is already a different key-value pair stored at that index, and we cannot insert the new key-value pair without overwriting the existing one.
+    return; // return after handling the collision 
+}
+
+
