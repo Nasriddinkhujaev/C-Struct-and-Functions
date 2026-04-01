@@ -97,3 +97,19 @@ void freeHashTable(HashTable *ht){
 // one line example usage of freeHashTable function
 // freeHashTable(hashTable); // frees the memory allocated for the hash table pointed to by hashTable, including all key-value pairs contained within it.
 
+// 7. Define a Hash function to get the index for a {key, value} pair in the Hash Table. [Hint: hash function only takes the key to compute the index]
+
+int hashFunction(char *key)
+{
+    int hash = 0; // Initialize a variable called hash to 0. This variable will be used to store the computed hash value for the given key.
+
+    for (int i = 0; key[i] != '\0'; i++) // loop through each character in the key string untill hit the null terminator '\0'
+    {
+        hash += key[i]; // add the ASCII value of the current character to the hash variable 
+    }
+
+    return hash; // return the computed hash value. this value will be used to determine the index in the hash table where the key-value pair should be stored.
+}
+// one line example usage of hashFunction
+// int index = hashFunction("name"); // computes the hash value for the key "name" and stores it in the variable index. this hash value can then be used to determine where to store the key-value pair in the hash table.
+
