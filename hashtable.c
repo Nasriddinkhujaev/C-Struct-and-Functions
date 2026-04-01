@@ -156,8 +156,16 @@ void delete(HashTable *ht, char *key){
     // check if key matches
     if (strcmp(ht->table[index]->key, key) != 0) 
     {
-        printf("Key not found: %s\n", key);
-        return;
+        while (index != ht->size){
+            if(ht->table[index] != NULL && strcmp(ht->table[index]->key, key) == 0){
+                break;
+            }
+            index = (index + 1) % ht->size; // increment the index by 1
+        }
+        if (index == ht->size){ // if we loop through the entire table and do not find the key 
+            printf("Key not found: %s\n", key); // print an error message 
+            return; 
+        }
     }
 
     // delete
