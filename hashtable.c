@@ -10,7 +10,7 @@ typedef struct  { // Define a structure called KeyValuePair. This structure will
     char *value; // value is also a pointer to a char, which means it can hold a string. This will be used to store the value in the key-value pair.
 } KeyValuePair; // This structure will be used to store key-value pairs in the hash table.
 // this code above is defining a type definition for structure called KeyValuePair with two members. when i need to use KeyValuePairs, i can simply declare a variable of type KeyValuePair instead of writing struct KeyValuePair every time.
-// example usage of KeyValuePair structure
+//   example   usage of KeyValuePair structure
 // KeyValuePair pair; // declare a variable of type KeyValuePair
 // pair.key = "name"; // assign a string to the key member of the pair variable
 // pair.value = "John"; // assign a string to the value member of the pair variable
@@ -22,7 +22,7 @@ typedef struct { // Define a structure called HashTable. This structure will rep
     KeyValuePair **table; // Array of key-value pairs. KeyValuePair** means that table is a pointer to a pointer to a KeyValuePair. this allows us to create a dynamic array of pointers to KeyValuePair structures. Each element in the table will point to a KeyValuePair structure that contains a key and a value.
     int size; // Number of table entries. 
 }HashTable;
-// example usage of HashTable structure
+//   example   usage of HashTable structure
 // HashTable hashTable = malloc(sizeof(HashTable)); // allocate memory for a HashTable structure. malloc returns a pointer to the allocated memory, which is stored in the variable hashTable.
 
 
@@ -38,7 +38,7 @@ KeyValuePair *createKeyValuePair(const char* key, const char* value){
     // -> is used to access members of a structure through a pointer. since pair is a pointer to a KeyValuePair structure, we use -> to access its members (key and value).
     return pair;
 }
-// one line example usage of createKeyValuePair function
+//     example  usage of createKeyValuePair function
 // KeyValuePair *pair = createKeyValuePair("name", "John");
 
 // 4. Create the Hash Table. [Hint: you need to allocate memory for the Hash Table, and set all {key, value} pairs to NULL since they are not used) 
@@ -62,7 +62,7 @@ HashTable *createHashTable( int size){
     }
     return ht; // return the pointer to the newly created HashTable structure.
 }
-// one line example usage of createHashTable function
+//     example  usage of createHashTable function
 // HashTable *hashTable = createHashTable(10); // creates a hash table with a size of 10, meaning it can hold up to 10 key-value pairs.
 
 // 5. Define a function to free up the memory of a {key, value} pair
@@ -75,7 +75,7 @@ void freeKeyValuePair(KeyValuePair *pair){
         free(pair); // free the memory allocated for the KeyValuePair structure itself after freeing the key and value strings.
     }
 }
-// one line example usage of freeKeyValuePair function
+//    example  usage of freeKeyValuePair function
 // freeKeyValuePair(pair); // frees the memory allocated for the key-value pair pointed to by pair.
 
 
@@ -94,7 +94,7 @@ void freeHashTable(HashTable *ht){
         free(ht); // free the memrory allocated for the HashTable structure itself after freeing the table array.
     }
 }
-// one line example usage of freeHashTable function
+//    example  usage of freeHashTable function
 // freeHashTable(hashTable); // frees the memory allocated for the hash table pointed to by hashTable, including all key-value pairs contained within it.
 
 // 7. Define a Hash function to get the index for a {key, value} pair in the Hash Table. [Hint: hash function only takes the key to compute the index]
@@ -110,7 +110,7 @@ int hashFunction(char *key)
 
     return hash; // return the computed hash value. this value will be used to determine the index in the hash table where the key-value pair should be stored.
 }
-// one line example usage of hashFunction
+//    example  usage of hashFunction
 // int index = hashFunction("name"); // computes the hash value for the key "name" and stores it in the variable index. this hash value can then be used to determine where to store the key-value pair in the hash table.
 
 // 8. Define an Insert function to insert a {key, value} pair into the Hash Table(15 points)
@@ -146,7 +146,7 @@ void insert (HashTable *ht, char *key, char *value){
     printf("Collision occurred at index %d\n", index); // print an error message that a collisionn occured at the computed index. this means that there is already a different key-value pair stored at that index, and we cannot insert the new key-value pair without overwriting the existing one.
     return; // return after handling the collision 
 }
-// one line example usage of insert function
+//    example   usage of insert function
 // insert(hashTable, "name", "John"); // inserts the key-value pair {"name, "John"} into the hash table pointed to by hashTable. if the key "name" already exists in the hash table, it will update the value to "John". if there is a collision at the computed index, it will print an error message indicating that a collision occurred.
 
 
@@ -173,7 +173,7 @@ void delete (HashTable *ht, char *key){
     freeKeyValuePair(ht->table[index]); // free the memory allocation 
     ht->table[index] = NULL; // set the index in the hash table to NULL 
 }
-// one line example usage of delete function
+//     example  usage of delete function
 // delete(hashTable, "name"); // deletes the key-value pair with the key "name" from the hash table pointed to by hashTable. if the key is not found in the hash table, it will print an error message indicating that the key was not found. if the key is found, it will free the memory allocated for the key-value pair and set the corresponding index in the hash table to NULL.
 
 
@@ -202,3 +202,53 @@ char *search(HashTable *ht, char *key)
 
     return NULL; // key not found
 }
+//   example   usage of search function
+// char *value = search(hashTable, "name"); // searches for the value associated with the key "name" in the hash table pointed to by hashTable. if the key is found, it returns the corresponding value. if the key is not found or if the hash table is null, it returns NULL to indicate that the search was unsuccessful.
+
+
+// 11. define a function to display all the {key, value} pairs in the hash table
+
+void displaySearchResult(HashTable *ht, char *key)
+{
+    char *value = search(ht, key); // call the search function to find the value associated with the given key in the hash table. the result is stored in the variable value.
+
+    if (value != NULL) // check if the value is not NULL
+    {
+        printf("Key: %s -> Value: %s\n", key, value);
+    }
+    else // if the value is NULL 
+    {
+        printf("Key not found: %s\n", key); // print an error message 
+    }
+}
+//  example   usage of displaySearchResult function
+// displaySearchResult(hashTable, "name"); // displays the search result for the key "name" in the hash table pointed to by hashTable. if the key is found, it will print the key and its corresponding value. if the key is not found, it will print an error message indicating that the key was not found.
+
+
+// 12. define a function to display all the {key, value} pairs in the hash table
+
+void displayHashTable(HashTable *ht)
+{
+    if (ht == NULL) // check if the hash table is null
+    {
+        return;
+    }
+
+    for (int i = 0; i < ht->size; i++) // loop through each index in the hash table from 0 to size-1
+    {
+        if (ht->table[i] != NULL) // check if the slot at index i is not empty (i.e., it contains a key-value pair). if it is not empty, we print the key and value stored at that index. if it is empty, we print that the index is NULL.
+        {
+            printf("Index %d: Key = %s, Value = %s\n",
+                i,
+                ht->table[i]->key,
+                ht->table[i]->value);
+        }
+        else // if the slot is empty, we print that the index is NULL
+        {
+            printf("Index %d: NULL\n", i);
+        }
+    }
+}
+//   example   usage of displayHashTable function
+// displayHashTable(hashTable); // displays all the key-value pairs in the hash table pointed to by hashTable.
+
