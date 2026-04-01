@@ -1,29 +1,10 @@
 #include <stdio.h> // for debugging purposes, can be removed later
 #include <stdlib.h> // for malloc and free
 #include <string.h> // 
+#include "hashtable.h" // for the hashtable struct and function prototypes
 // #include "hashtable.h" // for the hashtable struct and function prototypes  
 
 // Use C struct to implement a hash table. The program should include the following:
-//  1. Define {key, value} structure. (Define key and value as char datatype)
-typedef struct  { // Define a structure called KeyValuePair. This structure will represent a key-value pair in the hash table.
-    char *key; // key is a pointer to a char, which means it can hold a string. This will be used to store the key in the key-value pair.
-    char *value; // value is also a pointer to a char, which means it can hold a string. This will be used to store the value in the key-value pair.
-} KeyValuePair; // This structure will be used to store key-value pairs in the hash table.
-// this code above is defining a type definition for structure called KeyValuePair with two members. when i need to use KeyValuePairs, i can simply declare a variable of type KeyValuePair instead of writing struct KeyValuePair every time.
-//   example   usage of KeyValuePair structure
-// KeyValuePair pair; // declare a variable of type KeyValuePair
-// pair.key = "name"; // assign a string to the key member of the pair variable
-// pair.value = "John"; // assign a string to the value member of the pair variable
-
-
-//  2. Define hash table structure
-
-typedef struct { // Define a structure called HashTable. This structure will represent the hash table itself and will contain an array of key-value pairs and the size of the table.
-    KeyValuePair **table; // Array of key-value pairs. KeyValuePair** means that table is a pointer to a pointer to a KeyValuePair. this allows us to create a dynamic array of pointers to KeyValuePair structures. Each element in the table will point to a KeyValuePair structure that contains a key and a value.
-    int size; // Number of table entries. 
-}HashTable;
-//   example   usage of HashTable structure
-// HashTable hashTable = malloc(sizeof(HashTable)); // allocate memory for a HashTable structure. malloc returns a pointer to the allocated memory, which is stored in the variable hashTable.
 
 
 //  3. Create {key, value} pair. [Hint: you need to allocate memory for the key and value and return a pointer to the {key, value} pair]
@@ -141,6 +122,16 @@ void insert (HashTable *ht, char *key, char *value){
         ht->table[index]->value = strdup(value); // update the value for the existing key by duplicating the new value string and assigning it to the value member of the KeyValuePair structure at that index
         return; // return after updating the value
     }
+    // while loop to handle collisions by adding 1 to index 
+    while(ht->table[index] != NULL){
+        index = (index + 1) % ht->size; // increment the index by 1 
+        if (ht->table[index] == NULL){
+            ht->table[index] = createKeyValuePair(key, value); // if we find an empty slop, insert it there and return
+            return;
+        }
+    }
+
+
 
     // case 3: if there is a collision
     printf("Collision occurred at index %d\n", index); // print an error message that a collisionn occured at the computed index. this means that there is already a different key-value pair stored at that index, and we cannot insert the new key-value pair without overwriting the existing one.
@@ -152,7 +143,7 @@ void insert (HashTable *ht, char *key, char *value){
 
 // 9. Define a function to delete a {key, value} pair from the Hash Table.
 
-void delete (HashTable *ht, char *key){
+void delete(HashTable *ht, char *key){
     int index = hashFunction(key) % ht->size; // compute the index for the given key using the hash function
 
     // check if empty
