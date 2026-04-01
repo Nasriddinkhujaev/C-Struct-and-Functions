@@ -62,3 +62,38 @@ HashTable *createHashTable( int size){
     }
     return ht; // return the pointer to the newly created HashTable structure.
 }
+// one line example usage of createHashTable function
+// HashTable *hashTable = createHashTable(10); // creates a hash table with a size of 10, meaning it can hold up to 10 key-value pairs.
+
+// 5. Define a function to free up the memory of a {key, value} pair
+void freeKeyValuePair(KeyValuePair *pair){
+    if(pair == NULL){
+        return; // nothing to free if the pair is NULL
+    }else{
+        free(pair->key);
+        free(pair->value);
+        free(pair); // free the memory allocated for the KeyValuePair structure itself after freeing the key and value strings.
+    }
+}
+// one line example usage of freeKeyValuePair function
+// freeKeyValuePair(pair); // frees the memory allocated for the key-value pair pointed to by pair.
+
+
+// 6. Define a function to free up the memory of the Hash Table.
+
+void freeHashTable(HashTable *ht){
+    if(ht == NULL){
+        return; // nothing to free if the hash table is null
+    }else{
+        for (int i = 0; i < ht->size; i++){
+            if(ht->table[i] != NULL){
+                freeKeyValuePair(ht->table[i]); // free each key value pair in the table using the freeKeyValuePair function defined earlier.
+            }
+        }
+        free(ht->table); // free the memory allocated for the array of pointers to KeyValuePair structures.
+        free(ht); // free the memrory allocated for the HashTable structure itself after freeing the table array.
+    }
+}
+// one line example usage of freeHashTable function
+// freeHashTable(hashTable); // frees the memory allocated for the hash table pointed to by hashTable, including all key-value pairs contained within it.
+
