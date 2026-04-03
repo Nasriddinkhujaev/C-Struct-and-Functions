@@ -33,7 +33,6 @@ int main(void)
     displaySearchResult(table, "name");
     displaySearchResult(table, "city");
     displaySearchResult(table, "missing");
-    printf("\n");
 
     // update existing key
     printf("=== Updating existing key ===\n");
@@ -48,7 +47,6 @@ int main(void)
     // delete a key that doesnt exist
     printf("=== Deleting 'city' again (should fail) ===\n");
     delete(table, "city");
-    printf("\n");
 
     freeHashTable(table);
     printf("Hash table memory freed.\n");
