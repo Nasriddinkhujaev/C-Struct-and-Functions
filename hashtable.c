@@ -138,64 +138,64 @@ int hashFunction(char *key)
 //      5.2 return an error message due to overflow
 // [Hint: the function header for insert is: void insert (HashTable* hashtable, char* key, char* value);]
 
-void insert(HashTable *ht, char *key, char *value)
+void insert(HashTable *ht, char *key, char *value) 
 {
-    if (ht == NULL || key == NULL || value == NULL)
+    if (ht == NULL || key == NULL || value == NULL) // check if the hash table, key or value is null
     {
         return; // invalid input
     }
-    int index = hashFunction(key) % ht->size;
+    int index = hashFunction(key) % ht->size; // compute the index 
 
-    if (ht->table[index] == NULL)
+    if (ht->table[index] == NULL) // check if the slot at the computed index is empty
     {
-        ht->table[index] = createKeyValuePair(key, value);
-        if (ht->table[index] != NULL)
+        ht->table[index] = createKeyValuePair(key, value); // if the slot is empty, we create a new key-value pair 
+        if (ht->table[index] != NULL) // check if the key-value pair was created successfully 
         {
             printf("Inserted: (%s, %s) at index %d\n", key, value, index);
         }
         return;
     }
 
-    if (strcmp(ht->table[index]->key, key) == 0)
+    if (strcmp(ht->table[index]->key, key) == 0) // check if the key at the computed index matches the key we want to insert 
     {
-        char *new_value = duplicateString(value);
-        if (new_value == NULL)
+        char *new_value = duplicateString(value); // if the keys match, we create a duplicate of the new value string to update the existing key-value pair
+        if (new_value == NULL) // if the memory allocation for the new value string fails, we print an error 
         {
             printf("memory allocation failed for value update\n");
             return;
         }
-        free(ht->table[index]->value);
-        ht->table[index]->value = new_value;
-        printf("Updated: key '%s' -> new value '%s' at index %d\n", key, value, index);
+        free(ht->table[index]->value); // free the memory allocated for the old value 
+        ht->table[index]->value = new_value; // update the value 
+        printf("Updated: key '%s' -> new value '%s' at index %d\n", key, value, index); // print a message 
         return;
     }
 
     printf("Error: collision at index %d. Cannot insert key '%s' (slot occupied by key '%s').\n",
-           index, key, ht->table[index]->key);
+           index, key, ht->table[index]->key); // if the slot is occupied by a different key, print an error message 
 }
 //    example   usage of insert function
 // insert(hashTable, "name", "John"); // inserts the key-value pair {"name, "John"} into the hash table pointed to by hashTable. if the key "name" already exists in the hash table, it will update the value to "John". if there is a collision at the computed index, it will print an error message indicating that a collision occurred.
 
 // 9. Define a function to delete a {key, value} pair from the Hash Table.
 
-void delete(HashTable *ht, char *key)
+void delete(HashTable *ht, char *key) 
 {
-    if (ht == NULL || key == NULL)
+    if (ht == NULL || key == NULL) // check if the hash table or key is null
     {
         return;
     }
 
-    int index = hashFunction(key) % ht->size;
+    int index = hashFunction(key) % ht->size; // compute the index 
 
-    if (ht->table[index] == NULL || strcmp(ht->table[index]->key, key) != 0)
+    if (ht->table[index] == NULL || strcmp(ht->table[index]->key, key) != 0) // check if the slot is empty or key does not match
     {
         printf("Delete failed: key '%s' not found.\n", key);
         return;
     }
 
-    freeKeyValuePair(ht->table[index]);
-    ht->table[index] = NULL;
-    printf("Deleted: key '%s' from index %d\n", key, index);
+    freeKeyValuePair(ht->table[index]); // free the memory allocated for key-value pair 
+    ht->table[index] = NULL; // set the slot to NULL after deletion
+    printf("Deleted: key '%s' from index %d\n", key, index); // print a message 
 }
 //     example  usage of delete function
 // delete(hashTable, "name"); // deletes the key-value pair with the key "name" from the hash table pointed to by hashTable. if the key is not found in the hash table, it will print an error message indicating that the key was not found. if the key is found, it will free the memory allocated for the key-value pair and set the corresponding index in the hash table to NULL.
@@ -209,12 +209,12 @@ char *search(HashTable *ht, char *key)
         return NULL;
     }
 
-    int index = hashFunction(key) % ht->size;
-    if (ht->table[index] != NULL && strcmp(ht->table[index]->key, key) == 0)
+    int index = hashFunction(key) % ht->size; // compute the index
+    if (ht->table[index] != NULL && strcmp(ht->table[index]->key, key) == 0) // check if the slot is not empty and key matches
     {
-        return ht->table[index]->value;
+        return ht->table[index]->value; // if slot is not empty and key matches, return the value
     }
-    return NULL;
+    return NULL; // else return NULL 
 }
 //   example   usage of search function
 // char *value = search(hashTable, "name"); // searches for the value associated with the key "name" in the hash table pointed to by hashTable. if the key is found, it returns the corresponding value. if the key is not found or if the hash table is null, it returns NULL to indicate that the search was unsuccessful.
@@ -253,9 +253,9 @@ void displayHashTable(HashTable *ht)
         if (ht->table[i] != NULL) // check if the slot at index i is not empty (i.e., it contains a key-value pair). if it is not empty, we print the key and value stored at that index. if it is empty, we print that the index is NULL.
         {
             printf("[%d] key = '%s ' value = '%s'\n",
-                   i,
-                   ht->table[i]->key,
-                   ht->table[i]->value);
+                i,
+                ht->table[i]->key,
+                ht->table[i]->value);
         }
         else // if the slot is empty, we print that the index is NULL
         {
