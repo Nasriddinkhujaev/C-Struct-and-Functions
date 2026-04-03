@@ -4,6 +4,17 @@
 #include "hashtable.h" // for the hashtable struct and function prototypes
 // #include "hashtable.h" // for the hashtable struct and function prototypes
 
+static char *duplicateString(const char *source)
+{
+    size_t len = strlen(source) + 1;
+    char *copy = malloc(len);
+    if (copy != NULL)
+    {
+        memcpy(copy, source, len);
+    }
+    return copy;
+}
+
 // Use C struct to implement a hash table. The program should include the following:
 
 //  3. Create {key, value} pair. [Hint: you need to allocate memory for the key and value and return a pointer to the {key, value} pair]
@@ -15,8 +26,16 @@ KeyValuePair *createKeyValuePair(const char *key, const char *value)
         printf("memory allocation failed for KeyValuePair\n"); // print error message
         return NULL;
     }
-    pair->key = strdup(key);     // strdup is a function that duplicates a string. it allocates memory for the new string and copies the content of the original string (key) into it. this is necessary because we want to store a copy of the key in the KeyValuePair structure, rather than just a pointer to the original string.
-    pair->value = strdup(value); // similarly, this line duplicates the value string and stores it in the value member of the KeyValuePair structure.
+    pair->key = duplicateString(key);     // duplicate key string
+    pair->value = duplicateString(value); // duplicate value string
+    if (pair->key == NULL || pair->value == NULL)
+    {
+        free(pair->key);
+        free(pair->value);
+        free(pair);
+        printf("memory allocation failed for key/value strings\n");
+        return NULL;
+    }
     // -> is used to access members of a structure through a pointer. since pair is a pointer to a KeyValuePair structure, we use -> to access its members (key and value).
     return pair;
 }
@@ -121,39 +140,38 @@ int hashFunction(char *key)
 
 void insert(HashTable *ht, char *key, char *value)
 {
-    if (ht == NULL)
+    if (ht == NULL || key == NULL || value == NULL)
     {
-        return; // if the hash table is null, just return
+        return; // invalid input
     }
-    int index = hashFunction(key) % ht->size; // compute the index for the given key
+    int index = hashFunction(key) % ht->size;
 
-    // case 1: if the index is not occupied
     if (ht->table[index] == NULL)
     {
-        ht->table[index] = createKeyValuePair(key, value); // if the index is not occupied, create a new key-value pair and insert it into the hash table at the computed index.
-        return;                                            // return after inserting the new key-value pair
-    }
-    // case 2: if the index is occupied
-    if (strcmp(ht->table[index]->key, key) == 0)
-    {                                            // check if the key at the occupied index matches the given key using strcmp
-        free(ht->table[index]->value);           // free the memory allocated for the old value to prevent memory leaks
-        ht->table[index]->value = strdup(value); // update the value for the existing key by duplicating the new value string and assigning it to the value member of the KeyValuePair structure at that index
-        return;                                  // return after updating the value
-    }
-    // while loop to handle collisions by adding 1 to index
-    while (ht->table[index] != NULL)
-    {
-        index = (index + 1) % ht->size; // increment the index by 1
-        if (ht->table[index] == NULL)
+        ht->table[index] = createKeyValuePair(key, value);
+        if (ht->table[index] != NULL)
         {
-            ht->table[index] = createKeyValuePair(key, value); // if we find an empty slop, insert it there and return
-            return;
+            printf("Inserted: (%s, %s) at index %d\n", key, value, index);
         }
+        return;
     }
 
-    // case 3: if there is a collision
-    printf("Collision occurred at index %d\n", index); // print an error message that a collisionn occured at the computed index. this means that there is already a different key-value pair stored at that index, and we cannot insert the new key-value pair without overwriting the existing one.
-    return;                                            // return after handling the collision
+    if (strcmp(ht->table[index]->key, key) == 0)
+    {
+        char *new_value = duplicateString(value);
+        if (new_value == NULL)
+        {
+            printf("memory allocation failed for value update\n");
+            return;
+        }
+        free(ht->table[index]->value);
+        ht->table[index]->value = new_value;
+        printf("Updated: key '%s' -> new value '%s' at index %d\n", key, value, index);
+        return;
+    }
+
+    printf("Error: collision at index %d. Cannot insert key '%s' (slot occupied by key '%s').\n",
+           index, key, ht->table[index]->key);
 }
 //    example   usage of insert function
 // insert(hashTable, "name", "John"); // inserts the key-value pair {"name, "John"} into the hash table pointed to by hashTable. if the key "name" already exists in the hash table, it will update the value to "John". if there is a collision at the computed index, it will print an error message indicating that a collision occurred.
@@ -162,36 +180,22 @@ void insert(HashTable *ht, char *key, char *value)
 
 void delete(HashTable *ht, char *key)
 {
-    int index = hashFunction(key) % ht->size; // compute the index for the given key using the hash function
-
-    // check if empty
-    if (ht->table[index] == NULL)
+    if (ht == NULL || key == NULL)
     {
-        printf("Key not found: %s\n", key);
         return;
     }
 
-    // check if key matches
-    if (strcmp(ht->table[index]->key, key) != 0)
+    int index = hashFunction(key) % ht->size;
+
+    if (ht->table[index] == NULL || strcmp(ht->table[index]->key, key) != 0)
     {
-        while (index != ht->size)
-        {
-            if (ht->table[index] != NULL && strcmp(ht->table[index]->key, key) == 0)
-            {
-                break;
-            }
-            index = (index + 1) % ht->size; // increment the index by 1
-        }
-        if (index == ht->size)
-        {                                       // if we loop through the entire table and do not find the key
-            printf("Key not found: %s\n", key); // print an error message
-            return;
-        }
+        printf("Delete failed: key '%s' not found.\n", key);
+        return;
     }
 
-    // delete
-    freeKeyValuePair(ht->table[index]); // free the memory allocation
-    ht->table[index] = NULL;            // set the index in the hash table to NULL
+    freeKeyValuePair(ht->table[index]);
+    ht->table[index] = NULL;
+    printf("Deleted: key '%s' from index %d\n", key, index);
 }
 //     example  usage of delete function
 // delete(hashTable, "name"); // deletes the key-value pair with the key "name" from the hash table pointed to by hashTable. if the key is not found in the hash table, it will print an error message indicating that the key was not found. if the key is found, it will free the memory allocated for the key-value pair and set the corresponding index in the hash table to NULL.
@@ -205,21 +209,12 @@ char *search(HashTable *ht, char *key)
         return NULL;
     }
 
-    int index = hashFunction(key) % ht->size; // compute the index for the given key using the hash function. this will determine where in the hash table we should look for the key-value pair.
-
-    // check if slot is empty
-    if (ht->table[index] == NULL) // check if the slot at the computed index is empty (i.e., it does not contain a key-value pair). if it is empty, it means that the key we are searching for is not present in the hash table, so we return NULL to indicate that the search was unsuccessful.
+    int index = hashFunction(key) % ht->size;
+    if (ht->table[index] != NULL && strcmp(ht->table[index]->key, key) == 0)
     {
-        return NULL;
+        return ht->table[index]->value;
     }
-
-    // check if key matches
-    if (strcmp(ht->table[index]->key, key) == 0) // check if the key at the computed index matches the given key using strcmp. if it matches, it means we have found the key-value pair we are looking for, so we return the value associated with that key.
-    {
-        return ht->table[index]->value; // return the value
-    }
-
-    return NULL; // key not found
+    return NULL;
 }
 //   example   usage of search function
 // char *value = search(hashTable, "name"); // searches for the value associated with the key "name" in the hash table pointed to by hashTable. if the key is found, it returns the corresponding value. if the key is not found or if the hash table is null, it returns NULL to indicate that the search was unsuccessful.
@@ -232,11 +227,11 @@ void displaySearchResult(HashTable *ht, char *key)
 
     if (value != NULL) // check if the value is not NULL
     {
-        printf("Key: %s -> Value: %s\n", key, value);
+        printf("Search '%s' → found, value = '%s'\n", key, value);
     }
     else // if the value is NULL
     {
-        printf("Key not found: %s\n", key); // print an error message
+        printf("Search '%s' → not found\n", key); // print an error message
     }
 }
 //  example   usage of displaySearchResult function
@@ -251,20 +246,23 @@ void displayHashTable(HashTable *ht)
         return;
     }
 
+    printf("--- Hash Table (size = %d) ---\n", ht->size);
+
     for (int i = 0; i < ht->size; i++) // loop through each index in the hash table from 0 to size-1
     {
         if (ht->table[i] != NULL) // check if the slot at index i is not empty (i.e., it contains a key-value pair). if it is not empty, we print the key and value stored at that index. if it is empty, we print that the index is NULL.
         {
-            printf("Index %d: Key = %s, Value = %s\n",
+            printf("[%d] key = '%s ' value = '%s'\n",
                    i,
                    ht->table[i]->key,
                    ht->table[i]->value);
         }
         else // if the slot is empty, we print that the index is NULL
         {
-            printf("Index %d: NULL\n", i);
+            printf("[%d] (empty)\n", i);
         }
     }
+    printf("------------------------------\n");
 }
 //   example   usage of displayHashTable function
 // displayHashTable(hashTable); // displays all the key-value pairs in the hash table pointed to by hashTable.
